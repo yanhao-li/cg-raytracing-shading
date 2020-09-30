@@ -14,12 +14,14 @@
 // Shortcut to avoid Eigen:: everywhere, DO NOT USE IN .h
 using namespace Eigen;
 
+int img_size = 100;
+
 void raytrace_sphere() {
 	std::cout << "Simple ray tracer, one sphere with orthographic projection" << std::endl;
 
 	const std::string filename("sphere_orthographic.png");
-	MatrixXd C = MatrixXd::Zero(800,800); // Store the color
-	MatrixXd A = MatrixXd::Zero(800,800); // Store the alpha mask
+	MatrixXd C = MatrixXd::Zero(img_size,img_size); // Store the color
+	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is orthographic, pointing in the direction -z and covering the unit square (-1,1) in x and y
 	Vector3d origin(-1,1,1);
@@ -68,8 +70,8 @@ void raytrace_parallelogram() {
 	std::cout << "Simple ray tracer, one parallelogram with orthographic projection" << std::endl;
 
 	const std::string filename("plane_orthographic.png");
-	MatrixXd C = MatrixXd::Zero(800,800); // Store the color
-	MatrixXd A = MatrixXd::Zero(800,800); // Store the alpha mask
+	MatrixXd C = MatrixXd::Zero(img_size,img_size); // Store the color
+	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is orthographic, pointing in the direction -z and covering the unit square (-1,1) in x and y
 	Vector3d origin(-1,1,1);
@@ -118,8 +120,8 @@ void raytrace_perspective() {
 	std::cout << "Simple ray tracer, one parallelogram with perspective projection" << std::endl;
 
 	const std::string filename("plane_perspective.png");
-	MatrixXd C = MatrixXd::Zero(800,800); // Store the color
-	MatrixXd A = MatrixXd::Zero(800,800); // Store the alpha mask
+	MatrixXd C = MatrixXd::Zero(img_size,img_size); // Store the color
+	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is perspective, pointing in the direction -z and covering the unit square (-1,1) in x and y
 	Vector3d origin(-1,1,1);
@@ -168,8 +170,8 @@ void raytrace_shading(){
 	std::cout << "Simple ray tracer, one sphere with different shading" << std::endl;
 
 	const std::string filename("shading.png");
-	MatrixXd C = MatrixXd::Zero(800,800); // Store the color
-	MatrixXd A = MatrixXd::Zero(800,800); // Store the alpha mask
+	MatrixXd C = MatrixXd::Zero(img_size,img_size); // Store the color
+	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is perspective, pointing in the direction -z and covering the unit square (-1,1) in x and y
 	Vector3d origin(-1,1,1);
@@ -179,8 +181,8 @@ void raytrace_shading(){
 	// Single light source
 	const Vector3d light_position(-1,1,1);
 	double ambient = 0.1;
-	MatrixXd diffuse = MatrixXd::Zero(800, 800);
-	MatrixXd specular = MatrixXd::Zero(800, 800);
+	MatrixXd diffuse = MatrixXd::Zero(img_size, img_size);
+	MatrixXd specular = MatrixXd::Zero(img_size, img_size);
 
 	for (unsigned i=0; i < C.cols(); ++i) {
 		for (unsigned j=0; j < C.rows(); ++j) {
