@@ -89,7 +89,7 @@ void raytrace_parallelogram() {
 	Vector3d pgram_v = Vector3d(-1,1,0) - pgram_origin;
 
 	// Single light source
-	const Vector3d light_position(-1,1,1);
+	const Vector3d light_position(-3, 3, 1);
 
 	for (unsigned i=0; i < C.cols(); ++i) {
 		for (unsigned j=0; j < C.rows(); ++j) {
@@ -108,24 +108,21 @@ void raytrace_parallelogram() {
 			bm << ae(0), ae(1), ae(2);
 
 			// Solve Ax = B
-
 			Vector3d x = Am.colPivHouseholderQr().solve(bm);
-			double u = x(0);
-			double v = x(1);
-			double t = x(2);
+			double u = x(0), v = x(1), t = x(2);
 
 			if (u >= 0 && u <= 1 && v >= 0 && v <= 1 && t > 0) {
-				// // TODO: The ray hit the parallelogram, compute the exact intersection point
-				// Vector3d ray_intersection(0,0,0);
+				// TODO: The ray hit the parallelogram, compute the exact intersection point
+				Vector3d ray_intersection = ray_origin + t * ray_direction;
 
-				// // TODO: Compute normal at the intersection point
-				// Vector3d ray_normal = ray_intersection.normalized();
+				// TODO: Compute normal at the intersection point
+				Vector3d ray_normal = pgram_u.cross(pgram_v).normalized();
 
-				// // Simple diffuse model
-				// C(i,j) = (light_position-ray_intersection).normalized().transpose() * ray_normal;
+				// Simple diffuse model
+				C(i,j) = (light_position - ray_intersection).normalized().transpose() * ray_normal;
 
-				// // Clamp to zero
-				// C(i,j) = std::max(C(i,j),0.);
+				// Clamp to zero
+				C(i,j) = std::max(C(i,j),0.);
 
 				// Disable the alpha mask for this pixel
 				A(i,j) = 1;
