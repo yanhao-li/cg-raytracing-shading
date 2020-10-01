@@ -77,16 +77,16 @@ void raytrace_parallelogram() {
 	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is orthographic, pointing in the direction -z and covering the unit square (-1,1) in x and y
-	Vector3d origin(-1,1,1);
-	Vector3d x_displacement(2.0/C.cols(),0,0);
-	Vector3d y_displacement(0,-2.0/C.rows(),0);
+	Vector3d origin(-3,3,1);
+	Vector3d x_displacement(6.0/C.cols(),0,0);
+	Vector3d y_displacement(0,-6.0/C.rows(),0);
 
 	// TODO: Parameters of the parallelogram (position of the lower-left corner + two sides)
-	Vector3d pgram_origin(0,0,0);
-	// vector ba
-	Vector3d pgram_u(2,0,0);
-	// vector da
-	Vector3d pgram_v(1,1,0);
+	Vector3d pgram_origin(-2,-1,0);
+	// vector ab
+	Vector3d pgram_u = Vector3d(1,-1,0) - pgram_origin;
+	// vector ad
+	Vector3d pgram_v = Vector3d(-1,1,0) - pgram_origin;
 
 	// Single light source
 	const Vector3d light_position(-1,1,1);
@@ -94,19 +94,18 @@ void raytrace_parallelogram() {
 	for (unsigned i=0; i < C.cols(); ++i) {
 		for (unsigned j=0; j < C.rows(); ++j) {
 			// Prepare the ray
-			Vector3d ray_origin = origin + double(i)*x_displacement + double(j)*y_displacement;
+			Vector3d ray_origin = origin + double(i) * x_displacement + double(j) * y_displacement;
 			Vector3d ray_direction = RowVector3d(0,0,-1);
-			Vector2d ray_on_xy(ray_origin(0),ray_origin(1));
 
 			// TODO: Check if the ray intersects with the parallelogram
 			Matrix3d Am;
-			Am << pgram_u(0), pgram_v(0), ray_direction(0),  
-				   pgram_u(1), pgram_v(1), ray_direction(1),  
-				   pgram_u(2), pgram_v(2), ray_direction(2);
+			Am << pgram_u(0), pgram_v(0), -ray_direction(0),  
+				   pgram_u(1), pgram_v(1), -ray_direction(1),  
+				   pgram_u(2), pgram_v(2), -ray_direction(2);
 					 
 			Vector3d bm;
-			Vector3d ea = pgram_origin - ray_origin;
-			bm << ea(0), ea(1), ea(2);
+			Vector3d ae = ray_origin - pgram_origin;
+			bm << ae(0), ae(1), ae(2);
 
 			// Solve Ax = B
 
