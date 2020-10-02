@@ -14,7 +14,7 @@
 // Shortcut to avoid Eigen:: everywhere, DO NOT USE IN .h
 using namespace Eigen;
 
-int img_size = 100;
+int img_size = 800;
 
 void raytrace_sphere() {
 	std::cout << "Simple ray tracer, one sphere with orthographic projection" << std::endl;
@@ -142,31 +142,46 @@ void raytrace_perspective() {
 	MatrixXd A = MatrixXd::Zero(img_size,img_size); // Store the alpha mask
 
 	// The camera is perspective, pointing in the direction -z and covering the unit square (-1,1) in x and y
-	Vector3d origin(-1,1,1);
-	Vector3d x_displacement(2.0/C.cols(),0,0);
-	Vector3d y_displacement(0,-2.0/C.rows(),0);
+	Vector3d origin(0,0,10);
+	Vector3d x_displacement(6.0/C.cols(),0,0);
+	Vector3d y_displacement(0,-6.0/C.rows(),0);
 
 	// TODO: Parameters of the parallelogram (position of the lower-left corner + two sides)
-	Vector3d pgram_origin;
-	Vector3d pgram_u;
-	Vector3d pgram_v;
+	Vector3d pgram_origin(2,-1,-4);
+	// vector ab
+	Vector3d pgram_u = Vector3d(5,-3,-2) - pgram_origin;
+	// vector ad
+	Vector3d pgram_v = Vector3d(0,-3,-2) - pgram_origin;
 
 	// Single light source
-	const Vector3d light_position(-1,1,1);
+	const Vector3d light_position(3,-5,3);
 
 	for (unsigned i=0; i < C.cols(); ++i) {
 		for (unsigned j=0; j < C.rows(); ++j) {
 			// TODO: Prepare the ray (origin point and direction)
-			Vector3d ray_origin = origin + double(i)*x_displacement + double(j)*y_displacement;
-			Vector3d ray_direction = RowVector3d(0,0,-1);
-
+			Vector3d ray_origin = origin;
+			Vector3d ray_direction = Vector3d(0,0,-1) * double(10) + double(i) * x_displacement + double(j) * y_displacement;
+			
 			// TODO: Check if the ray intersects with the parallelogram
-			if (true) {
+			Matrix3d Am;
+			Am << pgram_u(0), pgram_v(0), -ray_direction(0),  
+				   pgram_u(1), pgram_v(1), -ray_direction(1),  
+				   pgram_u(2), pgram_v(2), -ray_direction(2);
+					 
+			Vector3d bm;
+			Vector3d ae = ray_origin - pgram_origin;
+			bm << ae(0), ae(1), ae(2);
+
+			// Solve Ax = B
+			Vector3d x = Am.colPivHouseholderQr().solve(bm);
+			double u = x(0), v = x(1), t = x(2);
+
+			if (u >= 0 && u <= 1 && v >= 0 && v <= 1 && t > 0) {
 				// TODO: The ray hit the parallelogram, compute the exact intersection point
-				Vector3d ray_intersection(0,0,0);
+				Vector3d ray_intersection = ray_origin + t * ray_direction;;
 
 				// TODO: Compute normal at the intersection point
-				Vector3d ray_normal = ray_intersection.normalized();
+				Vector3d ray_normal = pgram_u.cross(pgram_v).normalized();
 
 				// Simple diffuse model
 				C(i,j) = (light_position-ray_intersection).normalized().transpose() * ray_normal;
